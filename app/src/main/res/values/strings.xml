@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">EyeBallMaze_Rocs_Model</string>
+    <string name="game_start">Start</string>
+    <string name="game_restart">Restart</string>
+    <string name="go_back_one_movement">Go back once</string>
+    <string name="sound_control">Sound</string>
+    <string name="board_block">This is a clickable board block</string>
+    <string name="empty_block">This is an empty block, cannot move to here</string>
+    <string name="game_auto">Game Start (Auto)</string>
+    <string name="game_manual">Game Start (Manual)</string>
+    <string name="sound_on">On</string>
+    <string name="sound_off">Off</string>
+    <string name="game_save">Save</string>
+    <string name="game_load">Load</string>
+    <string name="number_of_goals">Number of Goal(s) : </string>
+    <string name="number_of_movements">Number of Movements : </string>
+</resources>
