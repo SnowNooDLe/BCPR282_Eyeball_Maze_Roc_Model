@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private int errorCount = 0;
     private int currRow;
     private int currCol;
-    private Piece theEndPiece;
+    private Piece theEndPiece, thePiece;
     private Eyeball eb;
     private GameGridIron gr;
 
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
 //        textViewForMovements.setText(R.string.number_of_movements + eb.countTotalMove());
 
 //        for image
-        setGoalInMaze(2,3);
+        setGoalInMaze(0,2);
         setPlayerInMaze(5,1);
     }
 
@@ -208,36 +208,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private int getLocationImageView(ImageView imageView) {
+    private String getLocationImageView(ImageView imageView) {
         // https://stackoverflow.com/questions/10137692/how-to-get-resource-name-from-resource-id
         String name = getResources().getResourceEntryName(imageView.getId());
         name = name.replace("imageView", "");
-        return Integer.parseInt(name);
+        return name;
     }
 
     public void onClickToMove(View view) {
         if (checkGameIsOver()){
             ImageView nextImageView = (ImageView) view;
 
-            String targetPosition = String.valueOf(getLocationImageView(nextImageView));
+            String targetPosition = getLocationImageView(nextImageView);
 //        to get row and col values
             int targetRow = Character.digit(targetPosition.charAt(0), 10);
             int targetCol = Character.digit(targetPosition.charAt(1), 10);
 
-            Piece thePiece = eb.getMyCurrentPiece();
+            thePiece = eb.getMyCurrentPiece();
 
 //            As it's Roc's model but he didnt have getter, so had to chance protected to public.
             currRow = thePiece.x;
             currCol = thePiece.y;
 
             if (eb.canDoNextMove(targetRow, targetCol)){
+                Log.d("MYINT", "I can move now, so moving now !");
 //            Resetting current spot's image
+                //        Debugging
+                Log.d("MYINT", "Resetting current Row: " + currRow);
+                Log.d("MYINT", "Resetting current Col: " + currCol);
                 imageViews[currRow][currCol].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[currRow][currCol]));
 
+                //        Debugging
+                Log.d("MYINT", "Resetting Target Row: " + targetRow);
+                Log.d("MYINT", "Resetting Target Col: " + targetCol);
                 imageViews[targetRow][targetCol].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[targetRow][targetCol]));
                 eb.moveToNextPieceSucceed(targetRow, targetCol);
 
-                movementHappening();
+                movementHappening(targetRow, targetCol);
 
 ////            recording movement
 //                eyeball.recordMovementHistory(targetRow, targetCol);
@@ -292,13 +299,15 @@ public class MainActivity extends AppCompatActivity {
 
     //    Task 7, Button for restarting the current maze
     private void resetStage(){
-////        resetting previous eyeball image
-//        gameIsOn = true;
-//        imageViews[eyeball.getCurrRowPosition()][eyeball.getCurrColPosition()].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[eyeball.getCurrRowPosition()][eyeball.getCurrColPosition()]));
-//        eyeball.resetPlayer();
-//        setPlayerInMaze(eyeball.getStartingRow(), eyeball.getStartingCol());
-//        setGoalInMaze(2,4);
-//        textViewForMovements.setText(R.string.number_of_movements + eyeball.getCurrentMoveCount());
+//        resetting previous eyeball image
+        gameIsOn = true;
+        imageViews[currRow][currCol].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[currRow][currCol]));
+        gr = new GameGridIron(0);
+        eb = new Eyeball (gr);
+        theEndPiece = gr.findEndPointPiece();
+        setPlayerInMaze(5, 1);
+        setGoalInMaze(0,2);
+        textViewForMovements.setText("Number of Movements: " + eb.countTotalMove());
     }
 
     //    Task 18 & Task 20,  Display dialogue with options after player character has lost
@@ -344,20 +353,38 @@ public class MainActivity extends AppCompatActivity {
     }
     //    Extra view feature 1, go back one movement
     public void goBackOneMove(View view){
-//        if (checkGameIsOver()){
-//            //        resetting current image without user.
-//            imageViews[eyeball.getCurrRowPosition()][eyeball.getCurrColPosition()].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[eyeball.getCurrRowPosition()][eyeball.getCurrColPosition()]));
-////        go back one movement which will decrease number of movement, position as well
-//            eyeball.goBackOneMove();
-//
-//            movementHappening();
-//
-////        update the number of movements as well
-//            textViewForMovements.setText(R.string.number_of_movements + eyeball.getCurrentMoveCount());
-//        } else {
-//            warningMSG("It only works when game is not finished");
-//        }
+        if (checkGameIsOver()){
+            int movementsNum = eb.getMyAllMovedPieces().size();
+            //        resetting current image without user.
+            int currentRow = eb.myAllMovedPieces.get(movementsNum-1).x;
+            int currentCol = eb.myAllMovedPieces.get(movementsNum-1).y;
+            imageViews[currentRow][currentCol].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[currentRow][currentCol]));
+//        go back one movement which will decrease number of movement, position as well
 
+            int previousRow = eb.myAllMovedPieces.get(movementsNum-2).x;
+            int previousCol = eb.myAllMovedPieces.get(movementsNum-2).y;
+
+            Log.d("MYINT", "Moving from current row " + currRow + " current col " + currCol);
+            Log.d("MYINT", "Moving to new row " + previousRow + " new col " + previousCol);
+//            its an issue with MODEL.
+//            as to check whether its possible to go back or not, we need to find out the specific previous coordinate
+//            but by doing that, its gonna go over the index of array
+//            e.g. I try to click go back once from starting point,
+//            in MODEL, it's checking the length of array inside its method,
+//            however, to get into this method, I need to put previous coordinate which is impossible.
+            if (eb.moveBackPreviousPieceSucceed(previousRow, previousCol)){
+                movementHappening(previousRow, previousCol);
+                //      update the number of movements as well
+                textViewForMovements.setText("Number of Movements : " + eb.countTotalMove());
+            } else {
+                warningMSG("You are at starting point, cannot go back");
+            }
+
+
+
+        } else {
+            warningMSG("It only works when game is not finished");
+        }
     }
 
     private Boolean checkGameIsOver(){
@@ -406,8 +433,8 @@ public class MainActivity extends AppCompatActivity {
 //        }
     }
 
-    public void movementHappening(){
-        Bitmap image1 = BitmapFactory.decodeResource(getResources(), imageSrcs[currRow][currCol]);
+    public void movementHappening(int targetRow, int targetCol){
+        Bitmap image1 = BitmapFactory.decodeResource(getResources(), imageSrcs[targetRow][targetCol]);
         Bitmap image2 = null;
 
         switch (eb.getMyCurrentDirection()){
@@ -426,6 +453,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Bitmap mergedImages = createSingleImageFromMultipleImages(image1, image2);
-        imageViews[currRow][currCol].setImageBitmap(mergedImages);
+        imageViews[targetRow][targetCol].setImageBitmap(mergedImages);
     }
 }

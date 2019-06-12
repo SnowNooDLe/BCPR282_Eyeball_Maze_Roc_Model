@@ -10,7 +10,8 @@ public class Eyeball {
 	private Piece myCurrentPiece;
 	private Timestamp myStartTime;
 	private Direction myCurrentDirection;
-	private ArrayList<Piece> myAllMovedPieces = new ArrayList<>();
+//	as there was no getter, had to change this to public
+	public ArrayList<Piece> myAllMovedPieces = new ArrayList<>();
 	
 	public Eyeball(GameGridIron newGameGridIron) {
 		this.myGameGridIron = newGameGridIron;
