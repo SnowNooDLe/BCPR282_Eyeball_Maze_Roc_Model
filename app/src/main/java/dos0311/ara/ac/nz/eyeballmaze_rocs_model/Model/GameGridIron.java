@@ -6,23 +6,14 @@ public class GameGridIron {
 	private Piece[][] levelMap; 
 	//create all Game Maps
 	private static final Piece[][][] ALL_MAP_LISTS = {
-//			Roc's Original
-//        {	//Level 0
-//            {new Piece(),new Piece(), new Piece(Shape.FLOWER,Colour.RED,PieceCharacter.END_POINT),new Piece()},
-//            {new Piece(Shape.CROSS,Colour.BLUE),new Piece(Shape.FLOWER,Colour.YELLOW), new Piece(Shape.DIAMOND,Colour.YELLOW), new Piece(Shape.CROSS,Colour.GREEN)},
-//            {new Piece(Shape.FLOWER,Colour.GREEN),new Piece(Shape.STAR,Colour.RED),new Piece(Shape.STAR,Colour.GREEN),new Piece(Shape.DIAMOND,Colour.YELLOW)},
-//            {new Piece(Shape.FLOWER,Colour.RED),new Piece(Shape.FLOWER,Colour.BLUE),new Piece(Shape.STAR,Colour.RED),new Piece(Shape.FLOWER,Colour.GREEN)},
-//            {new Piece(Shape.STAR,Colour.BLUE),new Piece(Shape.DIAMOND,Colour.RED),new Piece(Shape.FLOWER,Colour.BLUE),new Piece(Shape.DIAMOND,Colour.BLUE)},
-//            {new Piece(),new Piece(Shape.DIAMOND,Colour.BLUE,PieceCharacter.START_POINT), new Piece(),new Piece()}
-//        },
-		{	//Level 0
-				{new Piece(),new Piece(), new Piece(Shape.FLOWER,Colour.RED),new Piece()},
-				{new Piece(Shape.CROSS,Colour.BLUE),new Piece(Shape.FLOWER,Colour.YELLOW), new Piece(Shape.DIAMOND,Colour.YELLOW), new Piece(Shape.CROSS,Colour.GREEN)},
-				{new Piece(Shape.FLOWER,Colour.GREEN),new Piece(Shape.STAR,Colour.RED),new Piece(Shape.STAR,Colour.GREEN),new Piece(Shape.DIAMOND,Colour.YELLOW, PieceCharacter.END_POINT)},
-				{new Piece(Shape.FLOWER,Colour.RED),new Piece(Shape.FLOWER,Colour.BLUE),new Piece(Shape.STAR,Colour.RED),new Piece(Shape.FLOWER,Colour.GREEN)},
-				{new Piece(Shape.STAR,Colour.BLUE),new Piece(Shape.DIAMOND,Colour.RED),new Piece(Shape.FLOWER,Colour.BLUE),new Piece(Shape.DIAMOND,Colour.BLUE)},
-				{new Piece(),new Piece(Shape.DIAMOND,Colour.BLUE,PieceCharacter.START_POINT), new Piece(),new Piece()}
-		},
+        {	//Level 0
+            {new Piece(),new Piece(), new Piece(Shape.FLOWER,Colour.RED,PieceCharacter.END_POINT),new Piece()},
+            {new Piece(Shape.CROSS,Colour.BLUE),new Piece(Shape.FLOWER,Colour.YELLOW), new Piece(Shape.DIAMOND,Colour.YELLOW), new Piece(Shape.CROSS,Colour.GREEN)},
+            {new Piece(Shape.FLOWER,Colour.GREEN),new Piece(Shape.STAR,Colour.RED),new Piece(Shape.STAR,Colour.GREEN),new Piece(Shape.DIAMOND,Colour.YELLOW)},
+            {new Piece(Shape.FLOWER,Colour.RED),new Piece(Shape.FLOWER,Colour.BLUE),new Piece(Shape.STAR,Colour.RED),new Piece(Shape.FLOWER,Colour.GREEN)},
+            {new Piece(Shape.STAR,Colour.BLUE),new Piece(Shape.DIAMOND,Colour.RED),new Piece(Shape.FLOWER,Colour.BLUE),new Piece(Shape.DIAMOND,Colour.BLUE)},
+            {new Piece(),new Piece(Shape.DIAMOND,Colour.BLUE,PieceCharacter.START_POINT), new Piece(),new Piece()}
+        },
         {	//Level 1
 	        {new Piece(), new Piece(),new Piece(Shape.FLOWER,Colour.RED,PieceCharacter.END_POINT),new Piece()},
 	        {new Piece(Shape.CROSS,Colour.BLUE),new Piece(Shape.FLOWER,Colour.BLUE),new Piece(Shape.DIAMOND,Colour.BLUE),new Piece(Shape.CROSS,Colour.GREEN)},
