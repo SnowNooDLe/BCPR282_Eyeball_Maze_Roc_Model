@@ -14,4 +14,6 @@
     <string name="game_load">Load</string>
     <string name="number_of_goals">Number of Goal(s) : </string>
     <string name="number_of_movements">Number of Movements : </string>
+    <string name="stage_one">Stage One</string>
+    <string name="stage_two">Stage Two</string>
 </resources>
