@@ -293,16 +293,9 @@ public class MainActivity extends AppCompatActivity {
             currCol = thePiece.y;
 
             if (eb.canDoNextMove(targetRow, targetCol)){
-                Log.d("MYINT", "I can move now, so moving now !");
 //            Resetting current spot's image
-                //        Debugging
-                Log.d("MYINT", "Resetting current Row: " + currRow);
-                Log.d("MYINT", "Resetting current Col: " + currCol);
                 imageViews[currRow][currCol].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[currRow][currCol]));
 
-                //        Debugging
-                Log.d("MYINT", "Resetting Target Row: " + targetRow);
-                Log.d("MYINT", "Resetting Target Col: " + targetCol);
 //                imageViews[targetRow][targetCol].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[targetRow][targetCol]));
                 eb.moveToNextPieceSucceed(targetRow, targetCol);
 
@@ -440,7 +433,10 @@ public class MainActivity extends AppCompatActivity {
 
                 int previousRow = eb.myAllMovedPieces.get(movementsNum-2).x;
                 int previousCol = eb.myAllMovedPieces.get(movementsNum-2).y;
+
+                eb.moveBackPreviousPieceSucceed(previousRow, previousCol);
                 movementHappening(previousRow, previousCol);
+
                 //      update the number of movements as well
                 textViewForMovements.setText("Number of Movements : " + eb.countTotalMove());
             }
