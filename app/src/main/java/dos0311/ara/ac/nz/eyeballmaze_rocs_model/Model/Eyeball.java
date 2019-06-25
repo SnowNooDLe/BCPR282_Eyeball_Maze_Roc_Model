@@ -7,9 +7,9 @@ import java.util.ArrayList;
 
 public class Eyeball {
 	private GameGridIron myGameGridIron;
-	private Piece myCurrentPiece;
+	public Piece myCurrentPiece;
 	private Timestamp myStartTime;
-	private Direction myCurrentDirection;
+	public Direction myCurrentDirection;
 //	as there was no getter, had to change this to public
 	public ArrayList<Piece> myAllMovedPieces = new ArrayList<>();
 	

@@ -2,9 +2,9 @@ package dos0311.ara.ac.nz.eyeballmaze_rocs_model.Model;
 
 public class Piece {
 	//for blank piece
-	protected PieceCharacter myCharacter;
-	protected Shape myShape;
-	protected Colour myColour;
+    public PieceCharacter myCharacter;
+	public Shape myShape;
+	public Colour myColour;
 	public int x;
 	public int y;
 	protected Direction myDirection;

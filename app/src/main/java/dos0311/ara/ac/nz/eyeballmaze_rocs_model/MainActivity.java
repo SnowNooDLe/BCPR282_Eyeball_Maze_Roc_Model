@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.media.MediaPlayer;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +17,16 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import dos0311.ara.ac.nz.eyeballmaze_rocs_model.Model.*;
 
@@ -31,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     int[][] imageSrcs = new int[6][4];
     TextView textViewForGoal;
     TextView textViewForMovements;
+    TextView textViewForStage;
+    //  Time to launch the another activity
+    private static int TIME_OUT = 1500;
     //    It means game is not finished yet if it is true.
     private Boolean gameIsOn;
     //    will be used for task 17, if user keep trying bad thing, popup warning with rule.
@@ -57,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private String currentDirection;
     private Point[] currentMovementHistry;
     private String[] currentDirectionHistory;
-
+    private boolean gameIsSaved;
 
 
     @Override
@@ -87,7 +100,8 @@ public class MainActivity extends AppCompatActivity {
 //        for the goal textView
         textViewForGoal = findViewById(R.id.textViewGoals);
         textViewForMovements = findViewById(R.id.textViewMovements);
-
+        textViewForStage = findViewById(R.id.stageIndicator);
+        gameIsSaved = false;
 
         startGame();
     }
@@ -95,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
     public void stageOneSetup(){
 //        when start new game, always reset the number of goal
         goal = 0;
+        gameIsSaved = false;
         for (int i = 0; i < rowSize; i++){
             for (int j = 0; j < colSize; j++){
                 String imageview = "imageView" + i + j;
@@ -151,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
     public void stageTwoSetup(){
 //        when start new game, always reset the number of goal
         goal = 0;
+        gameIsSaved = false;
         for (int i = 0; i < rowSize; i++){
             for (int j = 0; j < colSize; j++){
                 String imageview = "imageView" + i + j;
@@ -205,6 +221,8 @@ public class MainActivity extends AppCompatActivity {
     public void startGameStageOne() {
         gameIsOn = true;
         currentStage = 1;
+//        Extra View Feature 4, stage indicator
+        textViewForStage.setText(R.string.stage_one);
         stageOneSetup();
         setTextForGoalMovement();
     }
@@ -212,6 +230,8 @@ public class MainActivity extends AppCompatActivity {
     public void startGameStageTwo(){
         gameIsOn = true;
         currentStage = 2;
+        //        Extra View Feature 4, stage indicator
+        textViewForStage.setText(R.string.stage_two);
         stageTwoSetup();
         setTextForGoalMovement();
     }
@@ -453,44 +473,168 @@ public class MainActivity extends AppCompatActivity {
         if (checkGameIsOver()){
             if (eb.isReachingStartPoint()){
                 warningMSG("You are still at starting point, no need to save");
+            } else {
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+                DatabaseReference goals = database.getReference("goals");
+                goals.setValue(goal);
+
+                DatabaseReference directions = database.getReference("directions");
+                directions.setValue(eb.getMyCurrentDirection());
+
+                DatabaseReference currentRowPosition = database.getReference("currentRowPosition");
+                currentRowPosition.setValue(eb.getMyCurrentPiece().x);
+
+                DatabaseReference currentColPosition = database.getReference("currentColPosition");
+                currentColPosition.setValue(eb.getMyCurrentPiece().y);
+
+
+                DatabaseReference movementDirectionHistory = database.getReference("movementDirectionHistory");
+                movementDirectionHistory.setValue(eb.getMyAllMovedPieces());
+
+
+                gameIsSaved = true;
             }
-//            currentNumOfMovements = eyeball.getCurrentMoveCount();
-//            currentNumOfGoals = board.getGoals();
-//            currentDirection = eyeball.getCurrentDirection();
-//            currentEyeballRowPosition = eyeball.getCurrRowPosition();
-//            currentEyeballColPosition = eyeball.getCurrColPosition();
-//            currentMovementHistry = eyeball.getMovementHistory();
-//            currentDirectionHistory = eyeball.getDirectionHistory();
+
 
         } else {
             warningMSG("Game is finished :) No need to save");
         }
     }
+    public void loadingDataFromDB(){
+        if (currentStage == 1){
+            gr = new GameGridIron(0);
+        } else if (currentStage == 2){
+            gr = new GameGridIron(1);
+        }
+
+        eb = new Eyeball (gr);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+//            For number of goals
+        DatabaseReference goals = database.getReference("goals");
+        // Attach a listener to read the data at our posts reference
+        goals.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Integer goalsFromDB = dataSnapshot.getValue(Integer.class);
+                goal = goalsFromDB;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+//            For Direction
+        DatabaseReference directions = database.getReference("directions");
+        // Attach a listener to read the data at our posts reference
+        directions.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Direction directionsFromDB = dataSnapshot.getValue(Direction.class);
+                eb.myCurrentDirection = directionsFromDB;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+//            For Row Position
+        DatabaseReference currentRowPosition = database.getReference("currentRowPosition");
+        // Attach a listener to read the data at our posts reference
+        currentRowPosition.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Integer currentRowPositionFromDB = dataSnapshot.getValue(Integer.class);
+                eb.myCurrentPiece.x = currentRowPositionFromDB;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+//            For Col Position
+        DatabaseReference currentColPosition = database.getReference("currentColPosition");
+        // Attach a listener to read the data at our posts reference
+        currentColPosition.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Integer currentColPositionFromDB = dataSnapshot.getValue(Integer.class);
+                eb.myCurrentPiece.y = currentColPositionFromDB;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+//            movement & direction history
+        DatabaseReference movementDirectionHistory = database.getReference("movementDirectionHistory");
+        // Attach a listener to read the data at our posts reference
+        movementDirectionHistory.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int i = 0;
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    Integer newX = ds.child("x").getValue(Integer.class);
+                    Integer newY = ds.child("y").getValue(Integer.class);
+                    if (!ds.child("startPoint").getValue(Boolean.class)){
+                        Log.d("MYINT", "What is the value from DB X: " + newX);
+                        Log.d("MYINT", "What is the value from DB Y: " + newY);
+                        eb.moveToNextPieceSucceed(newX, newY);
+                    }
+
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });
+
+    }
+
+    public void restSetupAfterLoad(){
+//            actual movement happening,
+        movementHappening(eb.myCurrentPiece.x, eb.myCurrentPiece.y);
+
+//        update the number of movements & Goal as well
+        textViewForMovements.setText("Number of Movements: " + eb.countTotalMove());
+        textViewForGoal.setText("Number of Goal(s): " + goal);
+
+    }
 
     //    Task 1, Button for loading a maze
     public void loadCurrentGame(View view){
-//        if (checkGameIsOver() && currentNumOfMovements != NULL){
-//            //        resetting current image without user.
-//            imageViews[eyeball.getCurrRowPosition()][eyeball.getCurrColPosition()].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[eyeball.getCurrRowPosition()][eyeball.getCurrColPosition()]));
-//
-//            eyeball.setCurrentNumOfMovements(currentNumOfMovements);
-//            board.setNumOfGoals(currentNumOfGoals);
-//            eyeball.setCurrentDirection(currentDirection);
-//            eyeball.setCurrentRowPosition(currentEyeballRowPosition);
-//            eyeball.setCurrentColPosition(currentEyeballColPosition);
-//            eyeball.setMovementHistory(currentMovementHistry);
-//            eyeball.setDirectionHistory(currentDirectionHistory);
-//
-////            actual movement happening,
-//            movementHappening();
-//
-////        update the number of movements & Goal as well
-//            textViewForMovements.setText("Number of Movements : " + eyeball.getCurrentMoveCount());
-//            textViewForGoal.setText("Number of Goal(s) : " + board.getGoals());
-//
-//        } else {
-//            warningMSG("You can only load the game when its not finished or been saved before");
-//        }
+        if (checkGameIsOver() && gameIsSaved){
+            thePiece = eb.getMyCurrentPiece();
+
+//            As it's Roc's model but he didnt have getter, so had to chance protected to public.
+            currRow = thePiece.x;
+            currCol = thePiece.y;
+            //        resetting current image without user.
+            imageViews[currRow][currCol].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[currRow][currCol]));
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    restSetupAfterLoad();
+                }
+            }, TIME_OUT);
+
+            loadingDataFromDB();
+        } else {
+//          EXTRA VIEW Feature 4, warning sign when it is not during the came or never been saved.
+            warningMSG("You can only load the game when its not finished or been saved before");
+        }
     }
 
     public void movementHappening(int targetRow, int targetCol){
