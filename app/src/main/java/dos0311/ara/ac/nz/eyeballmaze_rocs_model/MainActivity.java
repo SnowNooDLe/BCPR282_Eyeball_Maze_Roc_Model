@@ -69,12 +69,12 @@ public class MainActivity extends AppCompatActivity {
 
 //        Task 14, Display a GUI element to control sound on / off
         soundOnOffSwitch = findViewById(R.id.switchSoundOnOff);
-        bgm = MediaPlayer.create(MainActivity.this, R.raw.hellomrmyyesterday);
+        bgm = MediaPlayer.create(MainActivity.this, R.raw.hypnotic_puzzle3);
         soundOnOffSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     // The toggle is enabled
-                    bgm = MediaPlayer.create(MainActivity.this,R.raw.hellomrmyyesterday);
+                    bgm = MediaPlayer.create(MainActivity.this,R.raw.hypnotic_puzzle3);
                     bgm.start();
                 } else {
                     // The toggle is disabled
@@ -418,14 +418,13 @@ public class MainActivity extends AppCompatActivity {
     //    Extra view feature 1, go back one movement
     public void goBackOneMove(View view){
         if (checkGameIsOver()){
-//            To find starting point
-            theStartPiece = gr.findStartPointPiece();
+
             int movementsNum = eb.getMyAllMovedPieces().size();
             //        resetting current image without user.
             int currentRow = eb.myAllMovedPieces.get(movementsNum-1).x;
             int currentCol = eb.myAllMovedPieces.get(movementsNum-1).y;
 //            compare whether player is at starting point
-            if (currentRow == theStartPiece.x && currentCol == theStartPiece.y){
+            if (eb.isReachingStartPoint()){
                 warningMSG("You are at starting point, cannot go back.");
             } else {
                 imageViews[currentRow][currentCol].setImageBitmap(BitmapFactory.decodeResource(getResources(), imageSrcs[currentRow][currentCol]));
@@ -451,7 +450,10 @@ public class MainActivity extends AppCompatActivity {
 
     //    Task 2, Button for saving a maze
     public void saveCurrentGame(View view){
-//        if (checkGameIsOver()){
+        if (checkGameIsOver()){
+            if (eb.isReachingStartPoint()){
+                warningMSG("You are still at starting point, no need to save");
+            }
 //            currentNumOfMovements = eyeball.getCurrentMoveCount();
 //            currentNumOfGoals = board.getGoals();
 //            currentDirection = eyeball.getCurrentDirection();
@@ -459,10 +461,10 @@ public class MainActivity extends AppCompatActivity {
 //            currentEyeballColPosition = eyeball.getCurrColPosition();
 //            currentMovementHistry = eyeball.getMovementHistory();
 //            currentDirectionHistory = eyeball.getDirectionHistory();
-//
-//        } else {
-//            warningMSG("Game is finished :) No need to save");
-//        }
+
+        } else {
+            warningMSG("Game is finished :) No need to save");
+        }
     }
 
     //    Task 1, Button for loading a maze
