@@ -219,26 +219,6 @@ public class MainActivity extends AppCompatActivity {
         currentStage = 2;
     }
 
-    //    So music will be paused when back button is pressed
-    @Override
-    public void onBackPressed ()
-    {
-        if (bgm != null)
-            bgm.stop();
-        super.onBackPressed();
-    }
-
-    @Override
-    public void onPause ()
-    {
-        if (bgm != null)
-        {
-            bgm.pause();
-            bgm.stop();
-        }
-        super.onPause();
-    }
-
     //    Starting the game with stage 1 but when it starts, always run stage one first
     public void startGameStageOne() {
         gameIsOn = true;
@@ -246,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
 //        Extra View Feature 4, stage indicator
         textViewForStage.setText(R.string.stage_one);
         stageOneSetup();
-        setTextForGoalMovement();
+        setUpTextViews();
     }
     //    Starting the game with stage 2
     public void startGameStageTwo(){
@@ -255,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         //        Extra View Feature 4, stage indicator
         textViewForStage.setText(R.string.stage_two);
         stageTwoSetup();
-        setTextForGoalMovement();
+        setUpTextViews();
     }
 
     //    Extra View Feature 3, choose stages via button click
@@ -277,10 +257,10 @@ public class MainActivity extends AppCompatActivity {
 //        Goal point
         theEndPiece = gr.findEndPointPiece();
 
-        setTextForGoalMovement();
+        setUpTextViews();
 
     }
-    public void setTextForGoalMovement(){
+    public void setUpTextViews(){
         //      Task 12. Display the number of goals to do
         textViewForGoal.setText("Number of Goal(s) : " + goal);
 //       Task 13. Display move counts
@@ -355,9 +335,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 errorCount++;
             }
-//            debugging purpose
-            Log.d("MYINT", "what is the EndPoint X: " + theEndPiece.x);
-            Log.d("MYINT", "what is the EndPoint Y: " + theEndPiece.y);
+
 //            theEndPiece is the goal.
             if (targetRow == theEndPiece.x && targetCol == theEndPiece.y){
 //               Task 15, playing winning song
@@ -617,13 +595,8 @@ public class MainActivity extends AppCompatActivity {
                     Integer newX = ds.child("x").getValue(Integer.class);
                     Integer newY = ds.child("y").getValue(Integer.class);
                     if (!ds.child("startPoint").getValue(Boolean.class)){
-                        Log.d("MYINT", "What is the value from DB X: " + newX);
-                        Log.d("MYINT", "What is the value from DB Y: " + newY);
                         eb.moveToNextPieceSucceed(newX, newY);
                     }
-
-
-
                 }
             }
 
