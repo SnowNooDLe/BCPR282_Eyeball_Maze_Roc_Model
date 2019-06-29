@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 //  Controller for Roc's MODEL
 
     Switch soundOnOffSwitch;
-    MediaPlayer bgm, lost_case_sound, won_case_sound;
+    MediaPlayer bgm = null, lost_case_sound, won_case_sound;
     ImageView[][] imageViews = new ImageView[6][4];
     int[][] imageSrcs = new int[6][4];
     TextView textViewForGoal;
@@ -161,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
         gr = new GameGridIron(0);
         eb = new Eyeball (gr);
+        currentStage = 1;
     }
 
     public void stageTwoSetup(){
@@ -215,6 +216,27 @@ public class MainActivity extends AppCompatActivity {
 
         gr = new GameGridIron(1);
         eb = new Eyeball (gr);
+        currentStage = 2;
+    }
+
+    //    So music will be paused when back button is pressed
+    @Override
+    public void onBackPressed ()
+    {
+        if (bgm != null)
+            bgm.stop();
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onPause ()
+    {
+        if (bgm != null)
+        {
+            bgm.pause();
+            bgm.stop();
+        }
+        super.onPause();
     }
 
     //    Starting the game with stage 1 but when it starts, always run stage one first
@@ -321,12 +343,6 @@ public class MainActivity extends AppCompatActivity {
 
                 movementHappening(targetRow, targetCol);
 
-////            recording movement
-//                eyeball.recordMovementHistory(targetRow, targetCol);
-////            recording direction
-//                eyeball.recordDirectionHisory();
-
-
 //        updating movements display
                 textViewForMovements.setText("Number of Movements : " + eb.countTotalMove());
             } else {
@@ -417,11 +433,28 @@ public class MainActivity extends AppCompatActivity {
     private void gameFinishedMSG(String message){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setMessage(message);
-        alertDialogBuilder.setPositiveButton("Restart",
+//      Local variable just for this dialog
+        String title;
+
+        //      As I only designed for first two stages,
+//      when it gets to second stage, only option will be restart
+        if (currentStage == 1){
+            title = "Go to stage 2";
+        } else {
+            title = "Restart !";
+        }
+
+        alertDialogBuilder.setPositiveButton(title,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
-                        resetCurrentStageForDialog();
+                        if (currentStage == 1){
+                            startGameStageTwo();
+
+                        } else{
+                            resetCurrentStageForDialog();
+                        }
+
                     }
                 });
 
